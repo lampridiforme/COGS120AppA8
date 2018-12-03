@@ -17,7 +17,7 @@ function toggleEditMode() {
     // remove onclick goto for recipes
     let thumbnails = document.getElementsByClassName('recipeblock');
     console.log(thumbnails);
-    for (let i = 0; i < thumbnails.length; i++) { // NOTE: does not actually work if we need unique urls
+    for (let i = 0; i < thumbnails.length; i++) { 
       console.log(thumbnails[i]);
       thumbnails[i].onclick = () => console.log('sorry, nothing');
     }
@@ -30,8 +30,24 @@ function toggleEditMode() {
 
     // add onclick goto for recipes
     let thumbnails = document.getElementsByClassName('recipeblock');
-    for (let i = 0; i < thumbnails.length; i++) { // NOTE: does not actually work if we need unique urls
-      thumbnails[i].onclick = () => goto("./recipeResultHome.html");
+    // based on the recipeid of the item that was clicked, grab the corresponding 
+    // entry in the mock database and save the url to localstorage, 
+    // then goto recipeResult.html
+    for (let i = 0; i < thumbnails.length; i++) { 
+      thumbnails[i].onclick = () => {
+        console.log("clicked");
+        console.log(thumbnails[i]);
+        let recipeId = thumbnails[i].getAttribute('recipeid');
+        console.log('recipeId: ' + recipeId);
+        // find corresponding recipe
+        for (let j = 0; j < mockRecipeData.length; j++) {
+          if (mockRecipeData[j].id == recipeId) { // loose equality so "0" == 0 
+            console.log('found the url: ' + mockRecipeData[j].url);
+            localStorage.setItem('recipeURL', mockRecipeData[j].url);
+            goto('./recipeResultHome.html');
+          }
+        }
+      }
     };
   }
 
@@ -42,7 +58,17 @@ function addToDay(recipe) {
   // newDiv.innerHTML = "<a href='" + recipe.url + "'>" + recipe.name + "</a>";
   newDiv.style.backgroundImage = "url(\'" + recipe.image + "\')";
   newDiv.style.backgroundSize = "cover";
-  newDiv.onclick = () => goto("./recipeResultHome.html");
+  // set onclick event to go to the url from the recipe in the DB entry 
+  // that matches the current id
+  newDiv.onclick = () => {
+    for (let i = 0; i < mockRecipeData.length; i++) {
+      if (recipe.id == mockRecipeData[i].id) {
+        localStorage.setItem('recipeURL', mockRecipeData[i].url);
+        break;
+      }
+    }
+    goto("./recipeResultHome.html")
+  };
   console.log(recipe.image);
   let newCloseButton = document.createElement("div");
   newCloseButton.innerHTML = "x";
